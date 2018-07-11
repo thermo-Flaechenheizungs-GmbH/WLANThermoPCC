@@ -8,10 +8,10 @@ namespace WLANThermoDesktopApp.Model
 {
     class Pitmaster
     {
-        int channel { get; set; }
-        int pid { get; set; }
-        int value { get; set; }
-        int set { get; set; }
-        string typ { get; set; }
+        public int channel { get; set; }
+        public int pid { get; set; }
+        public int value { get; set; }
+        public float set { get; set; }
+        public string typ { get; set; }
     }
 }

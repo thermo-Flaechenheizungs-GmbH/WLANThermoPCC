@@ -68,13 +68,19 @@ namespace WLANThermoDesktopApp
         public static async Task getData()
         {
             var jsonString = await getJSONData();
-            dynamic json = JsonConvert.DeserializeObject(jsonString);
-            Console.WriteLine("DATA: " + json.pitmaster );
+            WLANThermoData json =  JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
+
+            Console.WriteLine("DATA: " + json);
         }
         public static async Task<String> getJSONData()
         {
             var response =  await _client.GetStringAsync("http://" + _ip + "/data");
             return  response; 
+        }
+
+        public static async Task setTemperature(double temp)
+        {
+
         }
 
         
