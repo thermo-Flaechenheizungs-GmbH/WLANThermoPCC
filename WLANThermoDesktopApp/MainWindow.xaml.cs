@@ -31,7 +31,8 @@ namespace WLANThermoDesktopApp
             _client.Timeout = TimeSpan.FromSeconds(5);
             InitializeComponent();
             ConnectThermometer();
-            getData();
+            //getData();
+            getSettings();
             
         }            
 
@@ -67,22 +68,26 @@ namespace WLANThermoDesktopApp
         }
         public static async Task getData()
         {
-            var jsonString = await getJSONData();
+            var jsonString = await getJSONData("/data");
             WLANThermoData json =  JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
 
             Console.WriteLine("DATA: " + json);
         }
-        public static async Task<String> getJSONData()
+        public static async Task getSettings()
         {
-            var response =  await _client.GetStringAsync("http://" + _ip + "/data");
+            var jsonString = await getJSONData("/settings");
+            WLANThermoSettings json = JsonConvert.DeserializeObject<WLANThermoSettings>(jsonString);
+
+            Console.WriteLine("Settings: " + json);
+        }
+        public static async Task<String> getJSONData(string service)
+        {
+            var response =  await _client.GetStringAsync("http://" + _ip + service );
             return  response; 
         }
 
-        public static async Task setTemperature(double temp)
-        {
-
-        }
-
+        
+        
         
       
     }

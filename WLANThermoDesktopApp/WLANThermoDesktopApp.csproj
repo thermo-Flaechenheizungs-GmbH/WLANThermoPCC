@@ -86,8 +86,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\Channel.cs" />
+    <Compile Include="Model\IoT.cs" />
+    <Compile Include="Model\PIDSettings.cs" />
     <Compile Include="Model\Pitmaster.cs" />
-    <Compile Include="Model\System.cs" />
+    <Compile Include="Model\WLANThermoSettings.cs" />
+    <Compile Include="Model\SystemData.cs" />
+    <Compile Include="Model\SystemSettings.cs" />
     <Compile Include="Model\WLANThermoData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

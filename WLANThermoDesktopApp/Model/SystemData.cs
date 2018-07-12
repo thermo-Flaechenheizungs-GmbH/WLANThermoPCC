@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WLANThermoDesktopApp.Model
 {
-    class System
+    class SystemData
     {
         public long time { get; set; }
         public int soc { get; set; }
