@@ -25,6 +25,7 @@ namespace WLANThermoDesktopApp
         public MainWindow()
         {
             InitializeComponent();            
-        }            
+        }
+
     }
 }

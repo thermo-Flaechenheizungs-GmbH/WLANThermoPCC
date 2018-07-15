@@ -73,6 +73,7 @@
     </ApplicationDefinition>
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="FloatToStringConverter.cs" />
+    <Compile Include="Model\PitmasterStep.cs" />
     <Compile Include="ObservableObject.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">

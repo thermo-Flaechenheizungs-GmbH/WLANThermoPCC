@@ -19,13 +19,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WLANThermoDesktopApp.Model;
 using System.Net.Http.Headers;
+using System.Collections.ObjectModel;
 
 namespace WLANThermoDesktopApp.ViewModel
 {
     class MainViewModel : ObservableObject
         {
 
-
+     
         private static readonly HttpClient _client = new HttpClient();
         private string _ip = "192.168.0.105";
         private bool _thermometerConnected = false;
@@ -44,9 +45,31 @@ namespace WLANThermoDesktopApp.ViewModel
         private float _kd_a;
         private int _dcmmin;
         private int _dcmmax;
+        private ObservableCollection<PitmasterStep> _pitmasterSteps = new ObservableCollection<PitmasterStep>();
+        private PitmasterStep _selectedPitmasterStep;
 
 
         #region Properties
+        public PitmasterStep SelectedPitmasterStep
+        {
+            get {
+                return _selectedPitmasterStep;
+            }
+            set {
+                _selectedPitmasterStep = value;
+                OnPropertyChanged();
+            }
+        }
+        public ObservableCollection<PitmasterStep> PitmasterSteps
+        {
+            get {
+                return _pitmasterSteps;
+            }
+            set {
+                _pitmasterSteps = value;
+                OnPropertyChanged();
+            }
+        }
         public string Username { get; set; }
         public string Password { get; set; }
         public string SelectedPIDProfile {
@@ -205,6 +228,10 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
+            _pitmasterSteps.Add(new PitmasterStep());
+            _pitmasterSteps.Add(new PitmasterStep());
+            _pitmasterSteps.Add(new PitmasterStep());
+
 
 
             //ConnectThermometer();
@@ -302,7 +329,30 @@ namespace WLANThermoDesktopApp.ViewModel
             var response = await _client.PostAsync("http://" + IP + service , new StringContent(data,Encoding.Default,"applicatioin/json"));
             return response.IsSuccessStatusCode;
         }
-
+        private void NewPitmasterStep (){
+            PitmasterSteps.Add(new PitmasterStep());
+        }
+        private void DeletePitmasterStep()
+        {
+            PitmasterSteps.Remove(SelectedPitmasterStep);
+            if (PitmasterSteps.Count != 0) {
+                SelectedPitmasterStep = PitmasterSteps.First();
+            }
+            else {
+                SelectedPitmasterStep = null;
+            }
+        }
+        private void MoveUpPitmasterStep()
+        {
+            var selectedIndex = PitmasterSteps.IndexOf(SelectedPitmasterStep);
+            PitmasterSteps.Move(selectedIndex, selectedIndex - 1);
+        }
+        private void MoveDownPitmasterStep()
+        {
+            var selectedIndex = PitmasterSteps.IndexOf(SelectedPitmasterStep);
+            PitmasterSteps.Move(selectedIndex, selectedIndex + 1);
+        }
+        #region EventHandlers
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             _timer.Stop();
@@ -314,7 +364,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer.Start();
         }
 
-        #region EventHandlers
+        
         public ICommand ConnectedThermometerClicked
         {
             get {
@@ -336,6 +386,30 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             get{
                 return new DelegateCommand(waitOnSetPIDProfile);
+            }
+        }
+        public ICommand NewEntryClicked
+        {
+            get {
+                return new DelegateCommand(NewPitmasterStep);
+            }
+        }
+        public ICommand DeleteEntryClicked
+        {
+            get {
+                return new DelegateCommand(DeletePitmasterStep);
+            }
+        }
+        public ICommand MoveUpEntryClicked
+        {
+            get {
+                return new DelegateCommand(MoveUpPitmasterStep);
+            }
+        }
+        public ICommand MoveDownEntryClicked
+        {
+            get{
+                return new DelegateCommand(MoveDownPitmasterStep);
             }
         }
         #endregion

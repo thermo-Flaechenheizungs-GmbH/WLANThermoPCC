@@ -17,8 +17,19 @@
         <TabItem Header="Pitmaster">
             <Grid >
                 <TextBox HorizontalAlignment="Left" Height="23" Margin="220,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}"/>
-                <DataGrid HorizontalAlignment="Left" Height="389" Margin="27,49,0,0" VerticalAlignment="Top" Width="195"/>
-
+                <DataGrid Name="DG"  HorizontalAlignment="Left" Height="431" Margin="10,10,0,0" VerticalAlignment="Top" Width="186" ItemsSource="{Binding PitmasterSteps}" AutoGenerateColumns="false" SelectedItem="{Binding SelectedPitmasterStep}" CanUserSortColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header="Fertig" Binding="{Binding Done}"/>
+                        <DataGridTextColumn Header="Temperatur" Binding="{Binding Temperature ,Converter={StaticResource FloatToStringConverter}}"/>
+                        <DataGridTextColumn Header="Minuten" Binding="{Binding Minutes}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Content="Start" HorizontalAlignment="Left" Margin="220,43,0,0" VerticalAlignment="Top" Width="94"/>
+                <Button Content="Neuer Eintrag" HorizontalAlignment="Left" Margin="220,68,0,0" VerticalAlignment="Top" Width="94" Command="{Binding NewEntryClicked}"/>
+                <Button Content="Eintrag löschen" HorizontalAlignment="Left" Margin="220,93,0,0" VerticalAlignment="Top" Width="94" Command="{Binding DeleteEntryClicked}"/>
+                <Button Content="Nach Oben" HorizontalAlignment="Left" Margin="220,118,0,0" VerticalAlignment="Top" Width="94" Command="{Binding MoveUpEntryClicked}"/>
+                <Button Content="Nach Unten" HorizontalAlignment="Left" Margin="220,143,0,0" VerticalAlignment="Top" Width="94" Command="{Binding MoveDownEntryClicked}"/>
+                
             </Grid>
         </TabItem>
         <TabItem Header="Settings">
@@ -27,7 +38,7 @@
                     <Grid>
                         <TextBox HorizontalAlignment="Left" Height="23" Margin="81,9,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding IP}"/>
                         <TextBox HorizontalAlignment="Left" Height="23" Margin="81,37,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Username}"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,65,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Password}"/> 
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,65,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Password}"/>
                         <Button Content="Connect" HorizontalAlignment="Left" Margin="206,9,0,0" VerticalAlignment="Top" Width="75" Height="23"  Command="{Binding ConnectedThermometerClicked}"/>
                         <Label Content="IP-Adresse:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,9,0,0" Height="23"/>
                         <Label Content="Username:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Height="23"/>
@@ -55,13 +66,7 @@
                         <TextBox HorizontalAlignment="Left" Height="23" Margin="81,232,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding DCmmax}"/>
                         <Label Content="DCmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,204,0,0" Height="23"/>
                         <Label Content="DCmax" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,232,0,0" Height="29" Width="66"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,261,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,289,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <Label Content="Aktor" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,261,0,0" Height="28"/>
-                        <Label Content="Sensor" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,289,0,0" Height="28"/>
                         <Button Content="Save to device" HorizontalAlignment="Left" Margin="206,33,0,0" VerticalAlignment="Top" Width="113" Height="23" Command="{Binding SetSettingsToDeviceClicked}"/>
-                        <Button Content="Load from file" HorizontalAlignment="Left" Margin="206,61,0,0" VerticalAlignment="Top" Width="113" Height="23"/>
-                        <Button Content="Save to file" HorizontalAlignment="Left" Margin="206,89,0,0" VerticalAlignment="Top" Width="113" Height="23"/>
                     </Grid>
                 </GroupBox>
 
