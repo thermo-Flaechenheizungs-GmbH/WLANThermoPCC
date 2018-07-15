@@ -28,13 +28,13 @@ namespace WLANThermoDesktopApp.ViewModel
 
      
         private static readonly HttpClient _client = new HttpClient();
-        private string _ip = "192.168.0.105";
+        private string _ip= "192.168.0.105";
         private bool _thermometerConnected = false;
         private Timer _timer;
         private WLANThermoData _thermoData;
         private WLANThermoSettings _thermoSettings;
-        private float _temp = 12.9f;
-        private readonly int _timerIntervall = 5000;
+        private float _temp ;
+        private readonly int _timerIntervall = 60000;
         private List<string> _pidProfiles = new List<string>();
         private string _selectedPIDProfile;
         private float _kp;
@@ -47,9 +47,29 @@ namespace WLANThermoDesktopApp.ViewModel
         private int _dcmmax;
         private ObservableCollection<PitmasterStep> _pitmasterSteps = new ObservableCollection<PitmasterStep>();
         private PitmasterStep _selectedPitmasterStep;
-
+        private PitmasterStep _currentPitmasterStep;
+        private int _elapsedMinutes;
 
         #region Properties
+        public PitmasterStep CurrentPitmasterStep{
+            get {
+                return _currentPitmasterStep;
+            }
+            set {
+                _currentPitmasterStep = value;
+                OnPropertyChanged();
+            }
+        }
+        public float TempTolerance { get; set; }
+        public int ElapsedMinutes {
+            get {
+                return _elapsedMinutes;
+            }
+            set {
+                _elapsedMinutes = value;
+                OnPropertyChanged();
+            }
+        }
         public PitmasterStep SelectedPitmasterStep
         {
             get {
@@ -228,9 +248,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-            _pitmasterSteps.Add(new PitmasterStep());
-            _pitmasterSteps.Add(new PitmasterStep());
-            _pitmasterSteps.Add(new PitmasterStep());
+
 
 
 
@@ -250,9 +268,10 @@ namespace WLANThermoDesktopApp.ViewModel
                 var temp = await getData("/");
                 if (!String.IsNullOrEmpty(temp)) {
                     _thermometerConnected = true;
-                    MessageBox.Show("Connection established!");
                     await getThermoData();
-                    //await getSettings();
+                    await getSettings();
+                    await setPIDProfile();
+                    MessageBox.Show("Connection established!");
                     _timer.Enabled = true;
 
                 }
@@ -260,6 +279,11 @@ namespace WLANThermoDesktopApp.ViewModel
             catch (OperationCanceledException e) {
                 Console.WriteLine(e.Message);
                 MessageBox.Show("Connection timed out! Check IP-Address!");
+                
+            }
+            catch(HttpRequestException e) {
+                MessageBox.Show("Check Credentials.");
+                _thermometerConnected = false;
             }
         }
 
@@ -315,23 +339,47 @@ namespace WLANThermoDesktopApp.ViewModel
             //TODO: Finish with rest of the Settings.
             await setData("/setpid", JsonConvert.SerializeObject(temp.ToList<PIDSettings>()));
         }
+
         public async Task<String> getData(string service)
         {
             var response = await _client.GetStringAsync("http://" + IP + service);
             return response;
         }
-        public async Task<bool> setData(string service, string data)
+        public void StartPitmaster()
+        {
+            if (_thermometerConnected) {
+                CurrentPitmasterStep = PitmasterSteps.First();
+                setPitmaster();
+                ElapsedMinutes = 0;
+                MessageBox.Show("Pitmaster Started.");
+            }else {
+                MessageBox.Show("Device is not connected!");
+            }
+        }
+        public async Task setPitmaster()
+        {
+            var temp = _thermoData.pitmaster;
+            temp.pid = PIDProfiles.IndexOf(SelectedPIDProfile);
+            temp.typ = "auto";
+            temp.set = CurrentPitmasterStep.Temperature;
+            await setData("/setpitmaster", JsonConvert.SerializeObject(temp));
+        }
+        public async Task setData(string service, string data)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
         "Basic",
         Convert.ToBase64String(
             ASCIIEncoding.ASCII.GetBytes( Username + ":"+ Password)));
             var response = await _client.PostAsync("http://" + IP + service , new StringContent(data,Encoding.Default,"applicatioin/json"));
-            return response.IsSuccessStatusCode;
+            if(response.StatusCode != System.Net.HttpStatusCode.OK) {
+                throw new HttpRequestException("Something went wrong.");
+            }
         }
+
         private void NewPitmasterStep (){
             PitmasterSteps.Add(new PitmasterStep());
         }
+
         private void DeletePitmasterStep()
         {
             PitmasterSteps.Remove(SelectedPitmasterStep);
@@ -342,25 +390,39 @@ namespace WLANThermoDesktopApp.ViewModel
                 SelectedPitmasterStep = null;
             }
         }
+
         private void MoveUpPitmasterStep()
         {
             var selectedIndex = PitmasterSteps.IndexOf(SelectedPitmasterStep);
             PitmasterSteps.Move(selectedIndex, selectedIndex - 1);
         }
+
         private void MoveDownPitmasterStep()
         {
             var selectedIndex = PitmasterSteps.IndexOf(SelectedPitmasterStep);
             PitmasterSteps.Move(selectedIndex, selectedIndex + 1);
         }
+
         #region EventHandlers
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             _timer.Stop();
             //TODO:Disable all other requests when timer is running.
-            //getThermoData().Wait();
+            getThermoData().Wait();
             var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.channel);
             _temp = channel.temp;
             Temp = _temp;
+            if (CurrentPitmasterStep != null) {
+                if (Temp > CurrentPitmasterStep.Temperature || ((Temp > (CurrentPitmasterStep.Temperature - TempTolerance)) && (Temp < (CurrentPitmasterStep.Temperature + TempTolerance)))) {
+                    ElapsedMinutes++;
+                }
+                if (ElapsedMinutes >= CurrentPitmasterStep.Minutes) {
+                    ElapsedMinutes = 0;
+                    CurrentPitmasterStep.Done = true;
+                    CurrentPitmasterStep = PitmasterSteps.ElementAt(PitmasterSteps.IndexOf(CurrentPitmasterStep)+1);
+                    setPitmaster();
+                }
+            }
             _timer.Start();
         }
 
@@ -410,6 +472,12 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             get{
                 return new DelegateCommand(MoveDownPitmasterStep);
+            }
+        }
+        public ICommand StartPitmasterClicked
+        {
+            get {
+                return new DelegateCommand(StartPitmaster);
             }
         }
         #endregion
