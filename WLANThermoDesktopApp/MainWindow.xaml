@@ -4,15 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WLANThermoDesktopApp.ViewModel"
+        xmlns:conv ="clr-namespace:WLANThermoDesktopApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="560" Width="569">
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <conv:FloatToStringConverter x:Key="FloatToStringConverter"/>
+    </Window.Resources>
     <TabControl>
         <TabItem Header="Pitmaster">
             <Grid >
-                <TextBox HorizontalAlignment="Left" Height="23" Margin="220,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp}"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="220,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}"/>
                 <DataGrid HorizontalAlignment="Left" Height="389" Margin="27,49,0,0" VerticalAlignment="Top" Width="195"/>
 
             </Grid>
@@ -21,9 +25,9 @@
             <Grid>
                 <GroupBox Header="Connection" HorizontalAlignment="Left" Height="115" Margin="10,10,0,0" VerticalAlignment="Top" Width="305">
                     <Grid>
-                        <TextBox  HorizontalAlignment="Left" Height="23" Margin="81,9,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding IP}"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,37,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <PasswordBox HorizontalAlignment="Left" Height="23" Margin="81,65,0,0" VerticalAlignment="Top" Width="120"  />
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,9,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding IP}"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,37,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Username}"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,65,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Password}"/> 
                         <Button Content="Connect" HorizontalAlignment="Left" Margin="206,9,0,0" VerticalAlignment="Top" Width="75" Height="23"  Command="{Binding ConnectedThermometerClicked}"/>
                         <Label Content="IP-Adresse:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,9,0,0" Height="23"/>
                         <Label Content="Username:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Height="23"/>
@@ -33,29 +37,29 @@
                 <GroupBox Header="Pitmaster" HorizontalAlignment="Left" Height="361" Margin="10,130,0,0" VerticalAlignment="Top" Width="452">
                     <Grid>
 
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,33,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,61,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <Button Content="Load from device" HorizontalAlignment="Left" Margin="206,5,0,0" VerticalAlignment="Top" Width="113" Height="23"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,33,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"  Text="{Binding Kp, Converter={StaticResource FloatToStringConverter}}" />
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,61,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Ki, Converter={StaticResource FloatToStringConverter}}" />
+                        <Button Content="Load from device" HorizontalAlignment="Left" Margin="206,5,0,0" VerticalAlignment="Top" Width="113" Height="23" Command="{Binding LoadSettingsFromDeviceClicked}"/>
                         <Label Content="Kp" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,33,0,0" Height="28"/>
                         <Label Content="Ki" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,61,0,0" Height="23"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="81,6,0,0" VerticalAlignment="Top" Width="120"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,90,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,118,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="81,6,0,0" VerticalAlignment="Top" Width="120" ItemsSource="{Binding PIDProfiles}"  SelectedItem="{Binding SelectedPIDProfile}"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,90,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"  Text="{Binding Kd, Converter={StaticResource FloatToStringConverter}}"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,118,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Kp_a, Converter={StaticResource FloatToStringConverter}}"/>
                         <Label Content="Kd" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,90,0,0" Height="23"/>
                         <Label Content="Kp__a" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,118,0,0" Height="29" Width="66"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,147,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,175,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,147,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Ki_a, Converter={StaticResource FloatToStringConverter}}"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,175,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding Kd_a, Converter={StaticResource FloatToStringConverter}}"/>
                         <Label Content="Ki__a" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,147,0,0" Height="28"/>
                         <Label Content="Kd__a" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,175,0,0" Height="28"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,204,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,232,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,204,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding DCmmin}"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="81,232,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Text="{Binding DCmmax}"/>
                         <Label Content="DCmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,204,0,0" Height="23"/>
                         <Label Content="DCmax" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,232,0,0" Height="29" Width="66"/>
                         <TextBox HorizontalAlignment="Left" Height="23" Margin="81,261,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
                         <TextBox HorizontalAlignment="Left" Height="23" Margin="81,289,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
                         <Label Content="Aktor" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,261,0,0" Height="28"/>
                         <Label Content="Sensor" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,289,0,0" Height="28"/>
-                        <Button Content="Save to device" HorizontalAlignment="Left" Margin="206,33,0,0" VerticalAlignment="Top" Width="113" Height="23"/>
+                        <Button Content="Save to device" HorizontalAlignment="Left" Margin="206,33,0,0" VerticalAlignment="Top" Width="113" Height="23" Command="{Binding SetSettingsToDeviceClicked}"/>
                         <Button Content="Load from file" HorizontalAlignment="Left" Margin="206,61,0,0" VerticalAlignment="Top" Width="113" Height="23"/>
                         <Button Content="Save to file" HorizontalAlignment="Left" Margin="206,89,0,0" VerticalAlignment="Top" Width="113" Height="23"/>
                     </Grid>
