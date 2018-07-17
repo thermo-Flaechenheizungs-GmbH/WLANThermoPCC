@@ -16,7 +16,7 @@
     <TabControl>
         <TabItem Header="Pitmaster">
             <Grid >
-                <TextBox HorizontalAlignment="Left" Height="23" Margin="279,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="279,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}" IsEnabled="False"/>
                 <DataGrid Name="DG"  HorizontalAlignment="Left" Height="431" Margin="10,10,0,0" VerticalAlignment="Top" Width="186" ItemsSource="{Binding PitmasterSteps}" AutoGenerateColumns="false" SelectedItem="{Binding SelectedPitmasterStep}" CanUserSortColumns="False">
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn Header="Fertig" Binding="{Binding Done}" />
@@ -29,7 +29,7 @@
                 <Button Content="Eintrag löschen" HorizontalAlignment="Left" Margin="201,116,0,0" VerticalAlignment="Top" Width="94" Command="{Binding DeleteEntryClicked}"/>
                 <Button Content="Nach Oben" HorizontalAlignment="Left" Margin="201,141,0,0" VerticalAlignment="Top" Width="94" Command="{Binding MoveUpEntryClicked}"/>
                 <Button Content="Nach Unten" HorizontalAlignment="Left" Margin="201,166,0,0" VerticalAlignment="Top" Width="94" Command="{Binding MoveDownEntryClicked}"/>
-                <TextBox HorizontalAlignment="Left" Height="23" Margin="309,10,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="64" Text="{Binding ElapsedMinutes}"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="309,10,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="64" Text="{Binding ElapsedMinutes}" IsEnabled="False"/>
                 <Label Content="VerstricheneZeit" HorizontalAlignment="Left" Margin="201,10,0,0" VerticalAlignment="Top" Width="101" Height="23"/>
                 <Label Content="Temperatur" HorizontalAlignment="Left" Margin="201,35,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
 

@@ -4,19 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.ComponentModel;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WLANThermoDesktopApp.Model;
 using System.Net.Http.Headers;
 using System.Collections.ObjectModel;
@@ -28,7 +19,7 @@ namespace WLANThermoDesktopApp.ViewModel
 
      
         private static readonly HttpClient _client = new HttpClient();
-        private string _ip= "192.168.0.105";
+        private string _ip;  
         private bool _thermometerConnected = false;
         private Timer _timer;
         private WLANThermoData _thermoData;
@@ -51,10 +42,9 @@ namespace WLANThermoDesktopApp.ViewModel
         private int _elapsedMinutes;
 
         #region Properties
-        public PitmasterStep CurrentPitmasterStep{
-            get {
-                return _currentPitmasterStep;
-            }
+        public PitmasterStep CurrentPitmasterStep
+        {
+            get => _currentPitmasterStep;
             set {
                 _currentPitmasterStep = value;
                 OnPropertyChanged();
@@ -62,9 +52,7 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float TempTolerance { get; set; }
         public int ElapsedMinutes {
-            get {
-                return _elapsedMinutes;
-            }
+            get => _elapsedMinutes;
             set {
                 _elapsedMinutes = value;
                 OnPropertyChanged();
@@ -72,9 +60,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public PitmasterStep SelectedPitmasterStep
         {
-            get {
-                return _selectedPitmasterStep;
-            }
+            get => _selectedPitmasterStep;
+            
             set {
                 _selectedPitmasterStep = value;
                 OnPropertyChanged();
@@ -82,9 +69,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public ObservableCollection<PitmasterStep> PitmasterSteps
         {
-            get {
-                return _pitmasterSteps;
-            }
+            get =>  _pitmasterSteps;
+            
             set {
                 _pitmasterSteps = value;
                 OnPropertyChanged();
@@ -93,9 +79,8 @@ namespace WLANThermoDesktopApp.ViewModel
         public string Username { get; set; }
         public string Password { get; set; }
         public string SelectedPIDProfile {
-            get {
-                return _selectedPIDProfile;
-            }
+            get => _selectedPIDProfile;
+           
             set {
                 _selectedPIDProfile = value;
                 //TODO: Check for a better call for this, or just if it gets the correct data.
@@ -113,9 +98,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Kp
         {
-            get {
-                return _kp;
-            }
+            get =>  _kp;
+            
             set {
                 _kp = value;
                 OnPropertyChanged();
@@ -123,9 +107,7 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Ki
         {
-            get {
-                return _ki;
-            }
+            get => _ki;
             set {
                 _ki = value;
                 OnPropertyChanged();
@@ -133,9 +115,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Kd
         {
-            get {
-                return _kd;
-            }
+            get => _kd;
+            
             set {
                 _kd = value;
                 OnPropertyChanged();
@@ -143,9 +124,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Kp_a
         {
-            get {
-                return _kp_a;
-            }
+            get => _kp_a;
+            
             set {
                 _kp_a = value;
                 OnPropertyChanged();
@@ -153,9 +133,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Ki_a
         {
-            get {
-                return _ki_a;
-            }
+            get => _ki_a;
+            
             set {
                 _ki_a = value;
                 OnPropertyChanged();
@@ -163,9 +142,8 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Kd_a
         {
-            get {
-                return _kd_a;
-            }
+            get => _kd_a;
+            
             set {
                 _kd_a = value;
                 OnPropertyChanged();
@@ -173,9 +151,7 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public int DCmmin
         {
-            get {
-                return _dcmmin;
-            }
+            get => _dcmmin;
             set {
                 _dcmmin = value;
                 OnPropertyChanged();
@@ -183,16 +159,14 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public int DCmmax
         {
-            get {
-                return _dcmmax;
-            }
+            get => _dcmmax;
             set {
                 _dcmmax = value;
                 OnPropertyChanged();
             }
         }
         public List<string> PIDProfiles {
-            get { return _pidProfiles; }
+            get => _pidProfiles; 
             set {
                 _pidProfiles = value;
                 OnPropertyChanged();
@@ -200,9 +174,7 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public WLANThermoSettings ThermoSettings
         {
-            get {
-                return _thermoSettings;
-            }
+            get =>  _thermoSettings;
             set {
                 _thermoSettings = value;
                 List<string>temp = new List<string>();
@@ -217,11 +189,9 @@ namespace WLANThermoDesktopApp.ViewModel
 
         public string IP
         {
-            get {
-                return _ip;
-            }
+            get => _ip;
             set {
-                if (String.IsNullOrEmpty(value)) {
+                if (string.IsNullOrEmpty(value)) {
                     MessageBox.Show("IP-Address invalid!");
                 }
                 else {
@@ -232,9 +202,7 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public float Temp
         {
-            get {
-                return _temp;
-            }
+            get => _temp;
             set {
                 _temp = value;
                 OnPropertyChanged();
@@ -258,19 +226,16 @@ namespace WLANThermoDesktopApp.ViewModel
 
         }
 
-        public void ConnectThermometer()
-        {
-            ConnectThermometerAsync();
-        }
+        public void ConnectThermometer() => ConnectThermometerAsync();
         public async void ConnectThermometerAsync()
          {
             try {
-                var temp = await getData("/");
-                if (!String.IsNullOrEmpty(temp)) {
+                var temp = await GetData("/");
+                if (!string.IsNullOrEmpty(temp)) {
                     _thermometerConnected = true;
-                    await getThermoData();
-                    await getSettings();
-                    await setPIDProfile();
+                    await GetThermoData();
+                    await GetSettings();
+                    await SetPIDProfile();
                     MessageBox.Show("Connection established!");
                     _timer.Enabled = true;
 
@@ -287,38 +252,31 @@ namespace WLANThermoDesktopApp.ViewModel
             }
         }
 
-        public void DisconnectThermometer()
-        {
-            _thermometerConnected = false;
-        }
-        public async Task getThermoData()
+        public void DisconnectThermometer() => _thermometerConnected = false;
+        public async Task GetThermoData()
         {   
-            var jsonString = await getData("/data");
+            var jsonString = await GetData("/data");
             _thermoData = JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
         }
         public void WaitForGetSettings()
         {
-            getSettings();
+            GetSettings();
             //TODO: This call is not waiting for the completion of the HTTP Request. Look for a better version.
         }
 
 
-        public async Task getSettings()
+        public async Task GetSettings()
         {
             if (_thermometerConnected) {
-                var jsonString = await getData("/settings");
+                var jsonString = await GetData("/settings");
                 ThermoSettings = JsonConvert.DeserializeObject<WLANThermoSettings>(jsonString);
             }
             else {
                 MessageBox.Show("Thermometer not connected!");
             }
         }
-        public void waitOnSetPIDProfile()
-        {
-            setPIDProfile();
-            
-        }
-        public async Task setPIDProfile()
+        public void WaitOnSetPIDProfile() => SetPIDProfile();
+        public async Task SetPIDProfile()
         {
             PIDSettings pid;
 
@@ -337,10 +295,10 @@ namespace WLANThermoDesktopApp.ViewModel
             
 
             //TODO: Finish with rest of the Settings.
-            await setData("/setpid", JsonConvert.SerializeObject(temp.ToList<PIDSettings>()));
+            await SetData("/setpid", JsonConvert.SerializeObject(temp.ToList<PIDSettings>()));
         }
 
-        public async Task<String> getData(string service)
+        public async Task<string> GetData(string service)
         {
             var response = await _client.GetStringAsync("http://" + IP + service);
             return response;
@@ -349,22 +307,22 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             if (_thermometerConnected) {
                 CurrentPitmasterStep = PitmasterSteps.First();
-                setPitmaster();
+                SetPitmaster();
                 ElapsedMinutes = 0;
                 MessageBox.Show("Pitmaster Started.");
             }else {
                 MessageBox.Show("Device is not connected!");
             }
         }
-        public async Task setPitmaster()
+        public async Task SetPitmaster()
         {
             var temp = _thermoData.pitmaster;
             temp.pid = PIDProfiles.IndexOf(SelectedPIDProfile);
             temp.typ = "auto";
             temp.set = CurrentPitmasterStep.Temperature;
-            await setData("/setpitmaster", JsonConvert.SerializeObject(temp));
+            await SetData("/setpitmaster", JsonConvert.SerializeObject(temp));
         }
-        public async Task setData(string service, string data)
+        public async Task SetData(string service, string data)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
         "Basic",
@@ -376,9 +334,7 @@ namespace WLANThermoDesktopApp.ViewModel
             }
         }
 
-        private void NewPitmasterStep (){
-            PitmasterSteps.Add(new PitmasterStep());
-        }
+        private void NewPitmasterStep ()=>PitmasterSteps.Add(new PitmasterStep());
 
         private void DeletePitmasterStep()
         {
@@ -408,7 +364,7 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             _timer.Stop();
             //TODO:Disable all other requests when timer is running.
-            getThermoData().Wait();
+            GetThermoData().Wait();
             var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.channel);
             _temp = channel.temp;
             Temp = _temp;
@@ -420,7 +376,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     ElapsedMinutes = 0;
                     CurrentPitmasterStep.Done = true;
                     CurrentPitmasterStep = PitmasterSteps.ElementAt(PitmasterSteps.IndexOf(CurrentPitmasterStep)+1);
-                    setPitmaster();
+                    SetPitmaster();
                 }
             }
             _timer.Start();
@@ -438,48 +394,13 @@ namespace WLANThermoDesktopApp.ViewModel
                 }
             }
         }
-        public ICommand LoadSettingsFromDeviceClicked
-        {
-            get {
-                return new DelegateCommand(WaitForGetSettings);
-            }
-        }
-        public ICommand SetSettingsToDeviceClicked
-        {
-            get{
-                return new DelegateCommand(waitOnSetPIDProfile);
-            }
-        }
-        public ICommand NewEntryClicked
-        {
-            get {
-                return new DelegateCommand(NewPitmasterStep);
-            }
-        }
-        public ICommand DeleteEntryClicked
-        {
-            get {
-                return new DelegateCommand(DeletePitmasterStep);
-            }
-        }
-        public ICommand MoveUpEntryClicked
-        {
-            get {
-                return new DelegateCommand(MoveUpPitmasterStep);
-            }
-        }
-        public ICommand MoveDownEntryClicked
-        {
-            get{
-                return new DelegateCommand(MoveDownPitmasterStep);
-            }
-        }
-        public ICommand StartPitmasterClicked
-        {
-            get {
-                return new DelegateCommand(StartPitmaster);
-            }
-        }
+        public ICommand LoadSettingsFromDeviceClicked => new DelegateCommand(WaitForGetSettings);
+        public ICommand SetSettingsToDeviceClicked => new DelegateCommand(WaitOnSetPIDProfile);
+        public ICommand NewEntryClicked => new DelegateCommand(NewPitmasterStep);
+        public ICommand DeleteEntryClicked => new DelegateCommand(DeletePitmasterStep);
+        public ICommand MoveUpEntryClicked => new DelegateCommand(MoveUpPitmasterStep);
+        public ICommand MoveDownEntryClicked => new DelegateCommand(MoveDownPitmasterStep);
+        public ICommand StartPitmasterClicked => new DelegateCommand(StartPitmaster);
         #endregion
     }
 }
