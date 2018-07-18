@@ -25,7 +25,7 @@ namespace WLANThermoDesktopApp.ViewModel
         private WLANThermoData _thermoData;
         private WLANThermoSettings _thermoSettings;
         private float _temp ;
-        private readonly int _timerIntervall = 60000;
+        private readonly int _timerIntervall = 1000;
         private List<string> _pidProfiles = new List<string>();
         private string _selectedPIDProfile;
         private float _kp;
@@ -39,7 +39,7 @@ namespace WLANThermoDesktopApp.ViewModel
         private ObservableCollection<PitmasterStep> _pitmasterSteps = new ObservableCollection<PitmasterStep>();
         private PitmasterStep _selectedPitmasterStep;
         private PitmasterStep _currentPitmasterStep;
-        private int _elapsedMinutes;
+        private int _elapsedTime;
 
         #region Properties
         public PitmasterStep CurrentPitmasterStep
@@ -51,10 +51,10 @@ namespace WLANThermoDesktopApp.ViewModel
             }
         }
         public float TempTolerance { get; set; }
-        public int ElapsedMinutes {
-            get => _elapsedMinutes;
+        public int ElapsedTime {
+            get => _elapsedTime;
             set {
-                _elapsedMinutes = value;
+                _elapsedTime = value;
                 OnPropertyChanged();
             }
         }
@@ -308,7 +308,7 @@ namespace WLANThermoDesktopApp.ViewModel
             if (_thermometerConnected) {
                 CurrentPitmasterStep = PitmasterSteps.First();
                 SetPitmaster();
-                ElapsedMinutes = 0;
+                ElapsedTime = 0;
                 MessageBox.Show("Pitmaster Started.");
             }else {
                 MessageBox.Show("Device is not connected!");
@@ -369,14 +369,22 @@ namespace WLANThermoDesktopApp.ViewModel
             _temp = channel.temp;
             Temp = _temp;
             if (CurrentPitmasterStep != null) {
-                if (Temp > CurrentPitmasterStep.Temperature || ((Temp > (CurrentPitmasterStep.Temperature - TempTolerance)) && (Temp < (CurrentPitmasterStep.Temperature + TempTolerance)))) {
-                    ElapsedMinutes++;
+                if (Temp > CurrentPitmasterStep.Temperature || (ElapsedTime > 0)) {
+                    ElapsedTime++;
                 }
-                if (ElapsedMinutes >= CurrentPitmasterStep.Minutes) {
-                    ElapsedMinutes = 0;
+                if (ElapsedTime >= CurrentPitmasterStep.Time) {
+                    ElapsedTime = 0;
                     CurrentPitmasterStep.Done = true;
-                    CurrentPitmasterStep = PitmasterSteps.ElementAt(PitmasterSteps.IndexOf(CurrentPitmasterStep)+1);
-                    SetPitmaster();
+                    var temp = PitmasterSteps.ToArray();
+                    temp[PitmasterSteps.IndexOf(CurrentPitmasterStep)] = CurrentPitmasterStep;
+                    PitmasterSteps =new ObservableCollection<PitmasterStep>( temp.ToList<PitmasterStep>());
+                    if(PitmasterSteps.Last().Equals(CurrentPitmasterStep)) {
+                        MessageBox.Show("Pitmaster finished!");
+                    }
+                    else {
+                        CurrentPitmasterStep = PitmasterSteps.ElementAt(PitmasterSteps.IndexOf(CurrentPitmasterStep)+1);
+                        SetPitmaster();
+                    }
                 }
             }
             _timer.Start();
