@@ -20,6 +20,8 @@ namespace WLANThermoDesktopApp.Model
         public string PMQuser { get; set; }
         public string PMQpass { get; set; }
         public int PMQqos { get; set; }
+        public bool PMQon { get; set; }
+        public int PMQint { get; set; }
         public bool TGon { get; set; }
         public string TGtoken { get; set; }
         public string TGid { get; set; }

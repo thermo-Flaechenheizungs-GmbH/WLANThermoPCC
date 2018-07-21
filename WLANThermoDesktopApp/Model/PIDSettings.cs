@@ -17,7 +17,7 @@ namespace WLANThermoDesktopApp.Model
         public float Kp_a { get; set; }
         public float Ki_a { get; set; }
         public float Kd_a { get; set; }
-        public int DCmmin { get; set; }
-        public int DCmmax { get; set; }
+        public float DCmmin { get; set; }
+        public float DCmmax { get; set; }
     }
 }

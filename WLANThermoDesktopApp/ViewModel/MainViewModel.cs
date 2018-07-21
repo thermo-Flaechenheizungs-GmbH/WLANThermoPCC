@@ -34,8 +34,8 @@ namespace WLANThermoDesktopApp.ViewModel
         private float _kp_a;
         private float _ki_a;
         private float _kd_a;
-        private int _dcmmin;
-        private int _dcmmax;
+        private float _dcmmin;
+        private float _dcmmax;
         private ObservableCollection<PitmasterStep> _pitmasterSteps = new ObservableCollection<PitmasterStep>();
         private PitmasterStep _selectedPitmasterStep;
         private PitmasterStep _currentPitmasterStep;
@@ -149,7 +149,7 @@ namespace WLANThermoDesktopApp.ViewModel
                 OnPropertyChanged();
             }
         }
-        public int DCmmin
+        public float DCmmin
         {
             get => _dcmmin;
             set {
@@ -157,7 +157,7 @@ namespace WLANThermoDesktopApp.ViewModel
                 OnPropertyChanged();
             }
         }
-        public int DCmmax
+        public float DCmmax
         {
             get => _dcmmax;
             set {
@@ -182,7 +182,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     temp.Add(item.name);
                 }
                 PIDProfiles = temp;
-                SelectedPIDProfile = temp.ToArray()[_thermoData.pitmaster.pid];
+                SelectedPIDProfile = temp.ToArray()[_thermoData.pitmaster.First().pid];
                 OnPropertyChanged();
             }
         }
@@ -316,11 +316,11 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public async Task SetPitmaster()
         {
-            var temp = _thermoData.pitmaster;
-            temp.pid = PIDProfiles.IndexOf(SelectedPIDProfile);
-            temp.typ = "auto";
-            temp.set = CurrentPitmasterStep.Temperature;
-            await SetData("/setpitmaster", JsonConvert.SerializeObject(temp));
+            var temp = _thermoData.pitmaster.First();
+            _thermoData.pitmaster.First().pid = PIDProfiles.IndexOf(SelectedPIDProfile);
+            _thermoData.pitmaster.First().typ = "auto";
+            _thermoData.pitmaster.First().set = CurrentPitmasterStep.Temperature;
+            await SetData("/setpitmaster", JsonConvert.SerializeObject(_thermoData.pitmaster));
         }
         public async Task SetData(string service, string data)
         {
@@ -365,7 +365,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer.Stop();
             //TODO:Disable all other requests when timer is running.
             GetThermoData().Wait();
-            var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.channel);
+            var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.First().channel);
             _temp = channel.temp;
             Temp = _temp;
             if (CurrentPitmasterStep != null) {
