@@ -3,10 +3,10 @@
 
 namespace WLANThermoDesktopApp
 {
-    public partial class MainWindow : Window { 
+    public partial class MainWindow : Window {
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
     }
 }

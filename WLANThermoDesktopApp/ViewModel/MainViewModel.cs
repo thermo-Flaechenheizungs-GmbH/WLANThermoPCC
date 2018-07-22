@@ -391,13 +391,17 @@ namespace WLANThermoDesktopApp.ViewModel
         private void MoveUpPitmasterStep()
         {
             var selectedIndex = PitmasterSteps.IndexOf(SelectedPitmasterStep);
-            PitmasterSteps.Move(selectedIndex, selectedIndex - 1);
+            if (selectedIndex > 0) {
+                PitmasterSteps.Move(selectedIndex, selectedIndex - 1);
+            }
         }
 
         private void MoveDownPitmasterStep()
         {
             var selectedIndex = PitmasterSteps.IndexOf(SelectedPitmasterStep);
-            PitmasterSteps.Move(selectedIndex, selectedIndex + 1);
+            if (selectedIndex < (PitmasterSteps.Count -1)) {
+                PitmasterSteps.Move(selectedIndex, selectedIndex + 1);
+            }
         }
 
         #region EventHandlers

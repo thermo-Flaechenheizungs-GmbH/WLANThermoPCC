@@ -24,11 +24,11 @@
                         <DataGridTextColumn Header="Sekunden" Binding="{Binding Time}"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Button Content="Start" HorizontalAlignment="Left" Margin="201,66,0,0" VerticalAlignment="Top" Width="94" Command="{Binding StartPitmasterClicked}"/>
-                <Button Content="Neuer Eintrag" HorizontalAlignment="Left" Margin="201,91,0,0" VerticalAlignment="Top" Width="94" Command="{Binding NewEntryClicked}"/>
-                <Button Content="Eintrag löschen" HorizontalAlignment="Left" Margin="201,116,0,0" VerticalAlignment="Top" Width="94" Command="{Binding DeleteEntryClicked}"/>
-                <Button Content="Nach Oben" HorizontalAlignment="Left" Margin="201,141,0,0" VerticalAlignment="Top" Width="94" Command="{Binding MoveUpEntryClicked}"/>
-                <Button Content="Nach Unten" HorizontalAlignment="Left" Margin="201,166,0,0" VerticalAlignment="Top" Width="94" Command="{Binding MoveDownEntryClicked}"/>
+                <Button Content="&#xf04b;" HorizontalAlignment="Left" Margin="201,66,0,0" VerticalAlignment="Top" Width="20" Command="{Binding StartPitmasterClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf067;" HorizontalAlignment="Left" Margin="201,91,0,0" VerticalAlignment="Top" Width="20" Command="{Binding NewEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf068;" HorizontalAlignment="Left" Margin="201,116,0,0" VerticalAlignment="Top" Width="20" Command="{Binding DeleteEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf077;" HorizontalAlignment="Left" Margin="201,141,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveUpEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf078;" HorizontalAlignment="Left" Margin="201,166,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveDownEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
                 <TextBox HorizontalAlignment="Left" Height="23" Margin="309,10,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="64" Text="{Binding ElapsedTime}" IsEnabled="False"/>
                 <Label Content="VerstricheneZeit" HorizontalAlignment="Left" Margin="201,10,0,0" VerticalAlignment="Top" Width="101" Height="23"/>
                 <Label Content="Temperatur" HorizontalAlignment="Left" Margin="201,35,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
