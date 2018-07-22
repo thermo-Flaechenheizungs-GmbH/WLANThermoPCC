@@ -11,6 +11,7 @@ using System.Windows.Input;
 using WLANThermoDesktopApp.Model;
 using System.Net.Http.Headers;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace WLANThermoDesktopApp.ViewModel
 {
@@ -176,13 +177,23 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             get =>  _thermoSettings;
             set {
-                _thermoSettings = value;
-                List<string>temp = new List<string>();
-                foreach (var item in _thermoSettings.pid) {
-                    temp.Add(item.name);
+                if (ThermoData != null) {
+                    _thermoSettings = value;
+                    List<string> temp = new List<string>();
+                    foreach (var item in _thermoSettings.pid) {
+                        temp.Add(item.name);
+                    }
+                    PIDProfiles = temp;
+                    SelectedPIDProfile = temp.ToArray()[_thermoData.pitmaster.First().pid];
+                    OnPropertyChanged();
                 }
-                PIDProfiles = temp;
-                SelectedPIDProfile = temp.ToArray()[_thermoData.pitmaster.First().pid];
+            }
+        }
+        public WLANThermoData ThermoData
+        {
+            get => _thermoData;
+            set {
+                _thermoData = value;
                 OnPropertyChanged();
             }
         }
@@ -216,9 +227,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-
-
-
+            
 
             //ConnectThermometer();
             //getData();
@@ -229,6 +238,16 @@ namespace WLANThermoDesktopApp.ViewModel
         public void ConnectThermometer() => ConnectThermometerAsync();
         public async void ConnectThermometerAsync()
          {
+            var ipPattern = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+            var rgx = new Regex(ipPattern);
+            if (String.IsNullOrEmpty(IP)) {
+                MessageBox.Show("Please enter a IP-Address!");
+                return;
+            }
+            else if (rgx.Matches(IP).Count ==0) {
+                MessageBox.Show("IP-Address not entered correctly");
+                return;
+            }
             try {
                 var temp = await GetData("/");
                 if (!string.IsNullOrEmpty(temp)) {
@@ -254,10 +273,22 @@ namespace WLANThermoDesktopApp.ViewModel
 
         public void DisconnectThermometer() => _thermometerConnected = false;
         public async Task GetThermoData()
-        {   
-            var jsonString = await GetData("/data");
-            _thermoData = JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
-        }
+        {
+            if (_thermometerConnected) 
+                { 
+                var jsonString = await GetData("/data");
+                try {
+                    ThermoData = JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
+                }
+                catch(Exception e) {
+                    MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                }
+            }
+            else {
+                MessageBox.Show("Thermometer not connected!");
+            }
+
+}
         public void WaitForGetSettings()
         {
             GetSettings();
@@ -269,7 +300,12 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             if (_thermometerConnected) {
                 var jsonString = await GetData("/settings");
-                ThermoSettings = JsonConvert.DeserializeObject<WLANThermoSettings>(jsonString);
+                try { 
+                    ThermoSettings = JsonConvert.DeserializeObject<WLANThermoSettings>(jsonString);
+                } 
+                catch (Exception e) {
+                    MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                }
             }
             else {
                 MessageBox.Show("Thermometer not connected!");
@@ -278,24 +314,29 @@ namespace WLANThermoDesktopApp.ViewModel
         public void WaitOnSetPIDProfile() => SetPIDProfile();
         public async Task SetPIDProfile()
         {
-            PIDSettings pid;
+            if (!_thermometerConnected) {
+                MessageBox.Show("Thermometer is not Connected!");
+                return;
+            }
+            if (ThermoSettings != null) {
+                PIDSettings pid;
+                //TODO: Check for a better call for this, or just if it gets the correct data.
+                pid = ThermoSettings.pid.ToArray()[PIDProfiles.IndexOf(SelectedPIDProfile)];
+                pid.Kd = Kd;
+                pid.Kd_a = Kd_a;
+                pid.Ki = Ki;
+                pid.Ki_a = Ki_a;
+                pid.Kd = Kd;
+                pid.Kd_a = Kd_a;
+                pid.DCmmax = DCmmax;
+                pid.DCmmin = DCmmin;
+                var temp = ThermoSettings.pid.ToArray();
+                temp[PIDProfiles.IndexOf(SelectedPIDProfile)] = pid;
 
-            //TODO: Check for a better call for this, or just if it gets the correct data.
-            pid = ThermoSettings.pid.ToArray()[PIDProfiles.IndexOf(SelectedPIDProfile)];
-            pid.Kd = Kd;
-            pid.Kd_a = Kd_a;
-            pid.Ki = Ki;
-            pid.Ki_a = Ki_a;
-            pid.Kd = Kd;
-            pid.Kd_a = Kd_a;
-            pid.DCmmax = DCmmax;
-            pid.DCmmin = DCmmin;
-            var temp = ThermoSettings.pid.ToArray();
-            temp[PIDProfiles.IndexOf(SelectedPIDProfile)] = pid;
-            
 
-            //TODO: Finish with rest of the Settings.
-            await SetData("/setpid", JsonConvert.SerializeObject(temp.ToList<PIDSettings>()));
+                //TODO: Finish with rest of the Settings.
+                await SetData("/setpid", JsonConvert.SerializeObject(temp.ToList<PIDSettings>()));
+            }
         }
 
         public async Task<string> GetData(string service)
@@ -365,6 +406,9 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer.Stop();
             //TODO:Disable all other requests when timer is running.
             GetThermoData().Wait();
+            if(ThermoData == null) {
+                return;
+            }
             var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.First().channel);
             _temp = channel.temp;
             Temp = _temp;
