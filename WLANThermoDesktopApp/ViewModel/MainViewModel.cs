@@ -41,8 +41,18 @@ namespace WLANThermoDesktopApp.ViewModel
         private PitmasterStep _selectedPitmasterStep;
         private PitmasterStep _currentPitmasterStep;
         private int _elapsedTime;
+        private bool _pitmasterRunning;
 
         #region Properties
+        public bool PitmasterRunning{
+            get {
+                return _pitmasterRunning;
+            }
+                set {
+                _pitmasterRunning = value;
+                OnPropertyChanged();
+            }
+        }
         public PitmasterStep CurrentPitmasterStep
         {
             get => _currentPitmasterStep;
@@ -227,7 +237,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-            
+
 
             //ConnectThermometer();
             //getData();
@@ -344,19 +354,39 @@ namespace WLANThermoDesktopApp.ViewModel
             var response = await _client.GetStringAsync("http://" + IP + service);
             return response;
         }
-        public void StartPitmaster()
+
+        public void StartStopPitmaster()
         {
-            if (_thermometerConnected) {
-                CurrentPitmasterStep = PitmasterSteps.First();
-                SetPitmaster();
+            if (_pitmasterRunning) {
+                StopPitmaster();
                 ElapsedTime = 0;
-                MessageBox.Show("Pitmaster Started.");
-            }else {
-                MessageBox.Show("Device is not connected!");
+                PitmasterRunning = false;
+                MessageBox.Show("Pitmaster Stopped!");
+
             }
+            else {
+                if (_thermometerConnected) {
+                    CurrentPitmasterStep = PitmasterSteps.First();
+                    PitmasterRunning = true;
+                    SetPitmaster();
+                    ElapsedTime = 0;
+                    MessageBox.Show("Pitmaster Started.");
+                    
+                }
+                else {
+                    MessageBox.Show("Device is not connected!");
+                }
+            }
+        }
+        public async Task StopPitmaster()
+        {
+            var temp = _thermoData.pitmaster.First();
+            _thermoData.pitmaster.First().typ = "off";
+            await SetData("/setpitmaster", JsonConvert.SerializeObject(_thermoData.pitmaster));
         }
         public async Task SetPitmaster()
         {
+            ElapsedTime = 0;
             var temp = _thermoData.pitmaster.First();
             _thermoData.pitmaster.First().pid = PIDProfiles.IndexOf(SelectedPIDProfile);
             _thermoData.pitmaster.First().typ = "auto";
@@ -416,7 +446,7 @@ namespace WLANThermoDesktopApp.ViewModel
             var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.First().channel);
             _temp = channel.temp;
             Temp = _temp;
-            if (CurrentPitmasterStep != null) {
+            if (CurrentPitmasterStep != null && PitmasterRunning) {
                 if (Temp > CurrentPitmasterStep.Temperature || (ElapsedTime > 0)) {
                     ElapsedTime++;
                 }
@@ -428,6 +458,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     PitmasterSteps =new ObservableCollection<PitmasterStep>( temp.ToList<PitmasterStep>());
                     if(PitmasterSteps.Last().Equals(CurrentPitmasterStep)) {
                         MessageBox.Show("Pitmaster finished!");
+                        StartStopPitmaster();
                     }
                     else {
                         CurrentPitmasterStep = PitmasterSteps.ElementAt(PitmasterSteps.IndexOf(CurrentPitmasterStep)+1);
@@ -456,7 +487,7 @@ namespace WLANThermoDesktopApp.ViewModel
         public ICommand DeleteEntryClicked => new DelegateCommand(DeletePitmasterStep);
         public ICommand MoveUpEntryClicked => new DelegateCommand(MoveUpPitmasterStep);
         public ICommand MoveDownEntryClicked => new DelegateCommand(MoveDownPitmasterStep);
-        public ICommand StartPitmasterClicked => new DelegateCommand(StartPitmaster);
+        public ICommand StartPitmasterClicked => new DelegateCommand(StartStopPitmaster);
         #endregion
     }
 }

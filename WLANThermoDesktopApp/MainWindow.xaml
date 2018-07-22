@@ -24,7 +24,18 @@
                         <DataGridTextColumn Header="Sekunden" Binding="{Binding Time}"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Button Content="&#xf04b;" HorizontalAlignment="Left" Margin="201,66,0,0" VerticalAlignment="Top" Width="20" Command="{Binding StartPitmasterClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button  HorizontalAlignment="Left" Margin="201,66,0,0" VerticalAlignment="Top" Width="20" Command="{Binding StartPitmasterClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="&#xf04b;"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PitmasterRunning}" Value="True">
+                                    <Setter Property="Content" Value="&#xf04d;"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 <Button Content="&#xf067;" HorizontalAlignment="Left" Margin="201,91,0,0" VerticalAlignment="Top" Width="20" Command="{Binding NewEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
                 <Button Content="&#xf068;" HorizontalAlignment="Left" Margin="201,116,0,0" VerticalAlignment="Top" Width="20" Command="{Binding DeleteEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
                 <Button Content="&#xf077;" HorizontalAlignment="Left" Margin="201,141,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveUpEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
