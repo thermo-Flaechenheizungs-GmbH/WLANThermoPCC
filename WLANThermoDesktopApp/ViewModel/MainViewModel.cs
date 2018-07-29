@@ -43,6 +43,7 @@ namespace WLANThermoDesktopApp.ViewModel
         private int _elapsedTime;
         private bool _pitmasterRunning = false;
         private bool _canEditDataGrid = true;
+        private Logger _logger;
 
 
         #region Properties
@@ -73,6 +74,7 @@ namespace WLANThermoDesktopApp.ViewModel
                 _currentPitmasterStep = value;
                 PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].TimeLeft = _currentPitmasterStep.Time;
                 PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.InProgress;
+                PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].HeatingTime = _currentPitmasterStep.HeatingTime;
                 _currentPitmasterStep = PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)];
                 OnPropertyChanged();
             }
@@ -253,7 +255,21 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-           
+            _logger = new Logger();
+            _logger.Path = @".\Logger.txt";
+/*
+            IP = "192.168.0.105";
+            Username = "admin";
+            Password = "admin";
+            var temp = new PitmasterStep();
+            temp.Time = 10;
+            temp.Temperature = 20;
+            PitmasterSteps.Add(temp);
+            temp = new PitmasterStep();
+            temp.Time = 10;
+            temp.Temperature = 30;
+            PitmasterSteps.Add(temp);
+  */
             //ConnectThermometer();
             //getData();
             //getSettings();
@@ -281,6 +297,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     await GetSettings();
                     await SetPIDProfile();
                     MessageBox.Show("Connection established!");
+
                     _timer.Enabled = true;
 
                 }
@@ -369,7 +386,10 @@ namespace WLANThermoDesktopApp.ViewModel
             var response = await _client.GetStringAsync("http://" + IP + service);
             return response;
         }
-
+        public static String GetTimestamp(DateTime value)
+        {
+            return value.ToString("yyyyMMddHHmmss");
+        }
         public void StartStopPitmaster()
         {
             if (PitmasterRunning) {
@@ -377,7 +397,8 @@ namespace WLANThermoDesktopApp.ViewModel
                 ElapsedTime = 0;
                 PitmasterRunning = false;
                 MessageBox.Show("Pitmaster Stopped!");
-
+                _logger.Log(GetTimestamp(DateTime.Now) + ";PitmasterStopped!");
+                
             }
             else {
                 if (_thermometerConnected) {
@@ -387,6 +408,9 @@ namespace WLANThermoDesktopApp.ViewModel
                         PitmasterRunning = true;
                         SetPitmaster();
                         MessageBox.Show("Pitmaster Started.");
+                        _logger.Log("Pitmaster Started.");
+                        _logger.Log(GetTimestamp(DateTime.Now) + ";" + "Temp" + ";" + "Seconds" + ";" + "HeatingTime" + ";" + "TimeLeft" + ";" + "CurrentTemp" + ";\n");
+                        _logger.Log(GetTimestamp(DateTime.Now) + ";" + CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft+ ";"+Temp+";\n");
                     }
                     catch(InvalidOperationException e) {
                         MessageBox.Show("Add entries first.");
@@ -467,10 +491,14 @@ namespace WLANThermoDesktopApp.ViewModel
             Temp = _temp;
             if (CurrentPitmasterStep != null && PitmasterRunning) {
                 if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft > CurrentPitmasterStep.Time)) {
-                    PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].TimeLeft--;
+                    CurrentPitmasterStep.TimeLeft--;
+                    _logger.Log(GetTimestamp(DateTime.Now) + ";" + CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
+
                 }
                 else if(Temp < CurrentPitmasterStep.Temperature) {
-                    PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].HeatingTime++;
+                    CurrentPitmasterStep.HeatingTime++;
+                    _logger.Log(GetTimestamp(DateTime.Now) + ";" + CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
+
                 }
                 if (CurrentPitmasterStep.TimeLeft == 0) {
                     PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].Status = Status.Done;
