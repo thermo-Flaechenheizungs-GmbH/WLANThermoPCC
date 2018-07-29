@@ -41,15 +41,28 @@ namespace WLANThermoDesktopApp.ViewModel
         private PitmasterStep _selectedPitmasterStep;
         private PitmasterStep _currentPitmasterStep;
         private int _elapsedTime;
-        private bool _pitmasterRunning;
+        private bool _pitmasterRunning = false;
+        private bool _canEditDataGrid = true;
+
 
         #region Properties
+        public bool CanEditDataGrid
+        {
+            get {
+                return _canEditDataGrid;
+            }
+            set {
+                _canEditDataGrid = value;
+                OnPropertyChanged();
+            }
+        }
         public bool PitmasterRunning{
             get {
                 return _pitmasterRunning;
             }
                 set {
                 _pitmasterRunning = value;
+                CanEditDataGrid = !_pitmasterRunning;
                 OnPropertyChanged();
             }
         }
@@ -58,6 +71,9 @@ namespace WLANThermoDesktopApp.ViewModel
             get => _currentPitmasterStep;
             set {
                 _currentPitmasterStep = value;
+                PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].TimeLeft = _currentPitmasterStep.Time;
+                PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.InProgress;
+                _currentPitmasterStep = PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)];
                 OnPropertyChanged();
             }
         }
@@ -237,8 +253,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-
-
+           
             //ConnectThermometer();
             //getData();
             //getSettings();
@@ -357,7 +372,7 @@ namespace WLANThermoDesktopApp.ViewModel
 
         public void StartStopPitmaster()
         {
-            if (_pitmasterRunning) {
+            if (PitmasterRunning) {
                 StopPitmaster();
                 ElapsedTime = 0;
                 PitmasterRunning = false;
@@ -366,12 +381,16 @@ namespace WLANThermoDesktopApp.ViewModel
             }
             else {
                 if (_thermometerConnected) {
-                    CurrentPitmasterStep = PitmasterSteps.First();
-                    PitmasterRunning = true;
-                    SetPitmaster();
-                    ElapsedTime = 0;
-                    MessageBox.Show("Pitmaster Started.");
-                    
+                    try {
+
+                        CurrentPitmasterStep = PitmasterSteps.First();
+                        PitmasterRunning = true;
+                        SetPitmaster();
+                        MessageBox.Show("Pitmaster Started.");
+                    }
+                    catch(InvalidOperationException e) {
+                        MessageBox.Show("Add entries first.");
+                    }
                 }
                 else {
                     MessageBox.Show("Device is not connected!");
@@ -447,20 +466,20 @@ namespace WLANThermoDesktopApp.ViewModel
             _temp = channel.temp;
             Temp = _temp;
             if (CurrentPitmasterStep != null && PitmasterRunning) {
-                if (Temp > CurrentPitmasterStep.Temperature || (ElapsedTime > 0)) {
-                    ElapsedTime++;
+                if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft > CurrentPitmasterStep.Time)) {
+                    PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].TimeLeft--;
                 }
-                if (ElapsedTime >= CurrentPitmasterStep.Time) {
-                    ElapsedTime = 0;
-                    CurrentPitmasterStep.Done = true;
-                    var temp = PitmasterSteps.ToArray();
-                    temp[PitmasterSteps.IndexOf(CurrentPitmasterStep)] = CurrentPitmasterStep;
-                    PitmasterSteps =new ObservableCollection<PitmasterStep>( temp.ToList<PitmasterStep>());
+                else if(Temp < CurrentPitmasterStep.Temperature) {
+                    PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].HeatingTime++;
+                }
+                if (CurrentPitmasterStep.TimeLeft == 0) {
+                    PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].Status = Status.Done;
                     if(PitmasterSteps.Last().Equals(CurrentPitmasterStep)) {
                         MessageBox.Show("Pitmaster finished!");
                         StartStopPitmaster();
                     }
                     else {
+                        
                         CurrentPitmasterStep = PitmasterSteps.ElementAt(PitmasterSteps.IndexOf(CurrentPitmasterStep)+1);
                         SetPitmaster();
                     }

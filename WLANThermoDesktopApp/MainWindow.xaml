@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WLANThermoDesktopApp.ViewModel"
-        xmlns:conv ="clr-namespace:WLANThermoDesktopApp"
+        xmlns:conv ="clr-namespace:WLANThermoDesktopApp.Converter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="560" Width="569">
+        Title="MainWindow" Height="472.333" Width="365.5">
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
@@ -16,15 +16,30 @@
     <TabControl>
         <TabItem Header="Pitmaster">
             <Grid >
-                <TextBox HorizontalAlignment="Left" Height="23" Margin="279,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}" IsEnabled="False"/>
-                <DataGrid Name="DG"  HorizontalAlignment="Left" Height="431" Margin="10,10,0,0" VerticalAlignment="Top" Width="186" ItemsSource="{Binding PitmasterSteps}" AutoGenerateColumns="false" SelectedItem="{Binding SelectedPitmasterStep}" CanUserSortColumns="False">
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="88,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}" IsEnabled="False"/>
+                <DataGrid Name="DG"  HorizontalAlignment="Left" Height="334" Margin="10,32,0,0" VerticalAlignment="Top" Width="304" ItemsSource="{Binding PitmasterSteps}" AutoGenerateColumns="false" SelectedItem="{Binding SelectedPitmasterStep}" CanUserSortColumns="False" IsEnabled="{Binding CanEditDataGrid}">
                     <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Header="Fertig" Binding="{Binding Done, Mode=TwoWay}" />
-                        <DataGridTextColumn Header="Temperatur" Binding="{Binding Temperature ,Converter={StaticResource FloatToStringConverter}}"/>
-                        <DataGridTextColumn Header="Sekunden" Binding="{Binding Time}"/>
+                        <DataGridTextColumn Header="Temp" Binding="{Binding Temperature ,Converter={StaticResource FloatToStringConverter}}"/>
+                        <DataGridTextColumn Header="Seconds" Binding="{Binding Time}"/>
+                        <DataGridTextColumn Header="Heating Time" Binding="{Binding HeatingTime}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Time left" Binding="{Binding TimeLeft}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" IsReadOnly="True"  FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid"/>
                     </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding  Status}" Value="Done">
+                                    <Setter Property="Background" Value="Green"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                    <Setter Property="Background" Value="Orange"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
                 </DataGrid>
-                <Button  HorizontalAlignment="Left" Margin="201,66,0,0" VerticalAlignment="Top" Width="20" Command="{Binding StartPitmasterClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20">
+                <Button  HorizontalAlignment="Left" Margin="319,32,0,0" VerticalAlignment="Top" Width="20" Command="{Binding StartPitmasterClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Content" Value="&#xf04b;"/>
@@ -36,13 +51,11 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Content="&#xf067;" HorizontalAlignment="Left" Margin="201,91,0,0" VerticalAlignment="Top" Width="20" Command="{Binding NewEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
-                <Button Content="&#xf068;" HorizontalAlignment="Left" Margin="201,116,0,0" VerticalAlignment="Top" Width="20" Command="{Binding DeleteEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
-                <Button Content="&#xf077;" HorizontalAlignment="Left" Margin="201,141,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveUpEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
-                <Button Content="&#xf078;" HorizontalAlignment="Left" Margin="201,166,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveDownEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
-                <TextBox HorizontalAlignment="Left" Height="23" Margin="309,10,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="64" Text="{Binding ElapsedTime}" IsEnabled="False"/>
-                <Label Content="VerstricheneZeit" HorizontalAlignment="Left" Margin="201,10,0,0" VerticalAlignment="Top" Width="101" Height="23"/>
-                <Label Content="Temperatur" HorizontalAlignment="Left" Margin="201,35,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
+                <Button Content="&#xf067;" HorizontalAlignment="Left" Margin="319,58,0,0" VerticalAlignment="Top" Width="20" Command="{Binding NewEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf068;" HorizontalAlignment="Left" Margin="319,82,0,0" VerticalAlignment="Top" Width="20" Command="{Binding DeleteEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf077;" HorizontalAlignment="Left" Margin="319,108,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveUpEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf078;" HorizontalAlignment="Left" Margin="319,132,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveDownEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Label Content="Temperatur" HorizontalAlignment="Left" Margin="10,1,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
 
             </Grid>
         </TabItem>
@@ -59,7 +72,7 @@
                         <Label Content="Passwort:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,65,0,0" Height="23"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Pitmaster" HorizontalAlignment="Left" Height="361" Margin="10,130,0,0" VerticalAlignment="Top" Width="452">
+                <GroupBox Header="Pitmaster" HorizontalAlignment="Left" Height="280" Margin="10,130,0,0" VerticalAlignment="Top" Width="332">
                     <Grid>
 
                         <TextBox HorizontalAlignment="Left" Height="23" Margin="81,33,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"  Text="{Binding Kp, Converter={StaticResource FloatToStringConverter}}" />
