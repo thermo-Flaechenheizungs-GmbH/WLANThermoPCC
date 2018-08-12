@@ -31,7 +31,7 @@ namespace WLANThermoDesktopApp.ViewModel
         private string _selectedPIDProfile;
         private float _kp;
         private float _ki;
-        private float _kd;
+        private float _kd; 
         private float _kp_a;
         private float _ki_a;
         private float _kd_a;
@@ -255,21 +255,21 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-            _logger = new Logger();
-            _logger.Path = @".\Logger.txt";
-/*
-            IP = "192.168.0.105";
+            _logger = new Logger(".\logs\");
+           
+
+            IP = "192.168.0.107";
             Username = "admin";
             Password = "admin";
             var temp = new PitmasterStep();
-            temp.Time = 10;
+            temp.Time = 100;
             temp.Temperature = 20;
             PitmasterSteps.Add(temp);
             temp = new PitmasterStep();
-            temp.Time = 10;
+            temp.Time = 100;
             temp.Temperature = 30;
             PitmasterSteps.Add(temp);
-  */
+  
             //ConnectThermometer();
             //getData();
             //getSettings();
@@ -319,11 +319,13 @@ namespace WLANThermoDesktopApp.ViewModel
             if (_thermometerConnected) 
                 { 
                 var jsonString = await GetData("/data");
-                try {
-                    ThermoData = JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
-                }
-                catch(Exception e) {
-                    MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                if (!string.IsNullOrEmpty(jsonString)) {
+                    try {
+                        ThermoData = JsonConvert.DeserializeObject<WLANThermoData>(jsonString);
+                    }
+                    catch (Exception e) {
+                        MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                    }
                 }
             }
             else {
@@ -342,11 +344,13 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             if (_thermometerConnected) {
                 var jsonString = await GetData("/settings");
-                try { 
-                    ThermoSettings = JsonConvert.DeserializeObject<WLANThermoSettings>(jsonString);
-                } 
-                catch (Exception e) {
-                    MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                if (!string.IsNullOrEmpty(jsonString)) {
+                    try {
+                        ThermoSettings = JsonConvert.DeserializeObject<WLANThermoSettings>(jsonString);
+                    }
+                    catch (Exception e) {
+                        MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                    }
                 }
             }
             else {
@@ -383,12 +387,14 @@ namespace WLANThermoDesktopApp.ViewModel
 
         public async Task<string> GetData(string service)
         {
-            var response = await _client.GetStringAsync("http://" + IP + service);
-            return response;
-        }
-        public static String GetTimestamp(DateTime value)
-        {
-            return value.ToString("yyyyMMddHHmmss");
+            try {
+                var response = await _client.GetStringAsync("http://" + IP + service);
+                return response;
+            }
+            catch(OperationCanceledException e) {
+                MessageBox.Show("Connection timed out! ");
+                return null;
+            }
         }
         public void StartStopPitmaster()
         {
@@ -397,7 +403,7 @@ namespace WLANThermoDesktopApp.ViewModel
                 ElapsedTime = 0;
                 PitmasterRunning = false;
                 MessageBox.Show("Pitmaster Stopped!");
-                _logger.Log(GetTimestamp(DateTime.Now) + ";PitmasterStopped!");
+                _logger.Log("PitmasterStopped!");
                 
             }
             else {
@@ -409,8 +415,8 @@ namespace WLANThermoDesktopApp.ViewModel
                         SetPitmaster();
                         MessageBox.Show("Pitmaster Started.");
                         _logger.Log("Pitmaster Started.");
-                        _logger.Log(GetTimestamp(DateTime.Now) + ";" + "Temp" + ";" + "Seconds" + ";" + "HeatingTime" + ";" + "TimeLeft" + ";" + "CurrentTemp" + ";\n");
-                        _logger.Log(GetTimestamp(DateTime.Now) + ";" + CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft+ ";"+Temp+";\n");
+                        _logger.Log("Temp" + ";" + "Seconds" + ";" + "HeatingTime" + ";" + "TimeLeft" + ";" + "CurrentTemp" + ";\n");
+                        _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft+ ";"+Temp+";\n");
                     }
                     catch(InvalidOperationException e) {
                         MessageBox.Show("Add entries first.");
@@ -492,12 +498,12 @@ namespace WLANThermoDesktopApp.ViewModel
             if (CurrentPitmasterStep != null && PitmasterRunning) {
                 if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft > CurrentPitmasterStep.Time)) {
                     CurrentPitmasterStep.TimeLeft--;
-                    _logger.Log(GetTimestamp(DateTime.Now) + ";" + CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
+                    _logger.Log( CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
 
                 }
                 else if(Temp < CurrentPitmasterStep.Temperature) {
                     CurrentPitmasterStep.HeatingTime++;
-                    _logger.Log(GetTimestamp(DateTime.Now) + ";" + CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
+                    _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
 
                 }
                 if (CurrentPitmasterStep.TimeLeft == 0) {
