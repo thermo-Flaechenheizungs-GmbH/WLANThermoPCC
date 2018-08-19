@@ -44,6 +44,7 @@ namespace WLANThermoDesktopApp.ViewModel
         private bool _pitmasterRunning = false;
         private bool _canEditDataGrid = true;
         private Logger _logger;
+        private int _connectionTimeoutCount = 0;
 
 
         #region Properties
@@ -313,7 +314,11 @@ namespace WLANThermoDesktopApp.ViewModel
             }
         }
 
-        public void DisconnectThermometer() => _thermometerConnected = false;
+        public void DisconnectThermometer()
+        {
+            _thermometerConnected = false;
+            _timer.Stop();
+        }
         public async Task GetThermoData()
         {
             if (_thermometerConnected) 
@@ -391,10 +396,17 @@ namespace WLANThermoDesktopApp.ViewModel
         {
             try {
                 var response = await _client.GetStringAsync("http://" + IP + service);
+                _connectionTimeoutCount = 0;
                 return response;
             }
             catch(OperationCanceledException e) {
-                MessageBox.Show("Connection timed out! ");
+                _connectionTimeoutCount++;
+                if (_connectionTimeoutCount == 5) {
+                    DisconnectThermometer();
+                    PitmasterRunning = false;
+                    _logger.Log("Connection was interrupted! Pitmaster stopped.");
+                    MessageBox.Show("Connection timed out! ");
+                }
                 _logger.Log("Connection timed out!");
                 return null;
             }
@@ -489,7 +501,9 @@ namespace WLANThermoDesktopApp.ViewModel
         #region EventHandlers
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            _timer.Stop();
+            if(_timer.Enabled == false) {
+                return;
+            }
             //TODO:Disable all other requests when timer is running.
             GetThermoData().Wait();
             if(ThermoData == null) {
@@ -525,7 +539,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     }
                 }
             }
-            _timer.Start();
+          
         }
 
         
