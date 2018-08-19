@@ -408,15 +408,15 @@ namespace WLANThermoDesktopApp.ViewModel
             }
             else {
                 if (_thermometerConnected) {
-                    try {
-
+                    try { 
                         CurrentPitmasterStep = PitmasterSteps.First();
                         PitmasterRunning = true;
+                        _logger.Log("Pitmaster Starting.");
+                        _logger.Log("Temp" + ";" + "Seconds" + ";" + "HeatingTime" + ";" + "TimeLeft" + ";" + "CurrentTemp" + ";\n");
+                        _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
                         SetPitmaster();
                         MessageBox.Show("Pitmaster Started.");
-                        _logger.Log("Pitmaster Started.");
-                        _logger.Log("Temp" + ";" + "Seconds" + ";" + "HeatingTime" + ";" + "TimeLeft" + ";" + "CurrentTemp" + ";\n");
-                        _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft+ ";"+Temp+";\n");
+ 
                     }
                     catch(InvalidOperationException e) {
                         MessageBox.Show("Add entries first.");

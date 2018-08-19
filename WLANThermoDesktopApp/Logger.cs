@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,9 @@ namespace WLANThermoDesktopApp
         public Logger(String root)
         {
             Path = root + Logger.GetTimestamp(DateTime.Now) + "log.txt";
+            if (!Directory.Exists(root)) {
+                Directory.CreateDirectory(root);
+            }
         }
         public void Log(String lines)
         {
