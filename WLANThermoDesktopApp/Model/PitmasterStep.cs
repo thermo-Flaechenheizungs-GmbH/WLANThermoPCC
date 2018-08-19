@@ -37,5 +37,5 @@ namespace WLANThermoDesktopApp.Model
             }
         }
     }
-    enum Status {NotStarted,InProgress,Done }
+    enum Status {NotStarted,HeatingUp,HoldingTemp,Done}
 }

@@ -73,7 +73,7 @@ namespace WLANThermoDesktopApp.ViewModel
             set {
                 _currentPitmasterStep = value;
                 PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].TimeLeft = _currentPitmasterStep.Time;
-                PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.InProgress;
+                PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.HeatingUp;
                 PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].HeatingTime = _currentPitmasterStep.HeatingTime;
                 _currentPitmasterStep = PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)];
                 OnPropertyChanged();
@@ -255,10 +255,10 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer = new Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
-            _logger = new Logger(".\logs\");
+            _logger = new Logger(@".\logs\");
            
 
-            IP = "192.168.0.107";
+            IP = "192.168.0.101";
             Username = "admin";
             Password = "admin";
             var temp = new PitmasterStep();
@@ -498,11 +498,13 @@ namespace WLANThermoDesktopApp.ViewModel
             if (CurrentPitmasterStep != null && PitmasterRunning) {
                 if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft > CurrentPitmasterStep.Time)) {
                     CurrentPitmasterStep.TimeLeft--;
+                    CurrentPitmasterStep.Status = Status.HoldingTemp;
                     _logger.Log( CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
 
                 }
                 else if(Temp < CurrentPitmasterStep.Temperature) {
                     CurrentPitmasterStep.HeatingTime++;
+                    CurrentPitmasterStep.Status = Status.HeatingUp;
                     _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
 
                 }
