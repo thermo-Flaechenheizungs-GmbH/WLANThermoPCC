@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WLANThermoDesktopApp.ViewModel"
         xmlns:conv ="clr-namespace:WLANThermoDesktopApp.Converter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="472.333" Width="365.5">
+        Title="WLANThermo PCC 0.4" Height="472.333" Width="365.5">
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
