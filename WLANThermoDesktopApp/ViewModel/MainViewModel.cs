@@ -297,7 +297,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     await GetSettings();
                     await SetPIDProfile();
                     MessageBox.Show("Connection established!");
-
+                    _logger.Log("Connection established!");
                     _timer.Enabled = true;
 
                 }
@@ -325,6 +325,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     }
                     catch (Exception e) {
                         MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                        _logger.Log(jsonString + "\n JSON couldn't be parsed.\n Contact Administrator!");
                     }
                 }
             }
@@ -350,6 +351,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     }
                     catch (Exception e) {
                         MessageBox.Show("JSON couldn't be parsed.\n Contact Administrator!");
+                        _logger.Log(jsonString + "\n JSON couldn't be parsed.\n Contact Administrator!");
                     }
                 }
             }
@@ -393,6 +395,7 @@ namespace WLANThermoDesktopApp.ViewModel
             }
             catch(OperationCanceledException e) {
                 MessageBox.Show("Connection timed out! ");
+                _logger.Log("Connection timed out!");
                 return null;
             }
         }
@@ -496,7 +499,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _temp = channel.temp;
             Temp = _temp;
             if (CurrentPitmasterStep != null && PitmasterRunning) {
-                if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft > CurrentPitmasterStep.Time)) {
+                if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft < CurrentPitmasterStep.Time)) {
                     CurrentPitmasterStep.TimeLeft--;
                     CurrentPitmasterStep.Status = Status.HoldingTemp;
                     _logger.Log( CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
@@ -512,6 +515,7 @@ namespace WLANThermoDesktopApp.ViewModel
                     PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].Status = Status.Done;
                     if(PitmasterSteps.Last().Equals(CurrentPitmasterStep)) {
                         MessageBox.Show("Pitmaster finished!");
+                        _logger.Log("Pitmaster finished!");
                         StartStopPitmaster();
                     }
                     else {
