@@ -74,7 +74,12 @@ namespace WLANThermoDesktopApp.ViewModel
             set {
                 _currentPitmasterStep = value;
                 PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].TimeLeft = _currentPitmasterStep.Time;
-                PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.HeatingUp;
+                if (_currentPitmasterStep.Temperature > Temp) {
+                    PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.HeatingUp;
+                }
+                else {
+                    PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].Status = Status.CoolingDown;
+                }
                 PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)].HeatingTime = _currentPitmasterStep.HeatingTime;
                 _currentPitmasterStep = PitmasterSteps[PitmasterSteps.IndexOf(_currentPitmasterStep)];
                 OnPropertyChanged();
@@ -512,18 +517,24 @@ namespace WLANThermoDesktopApp.ViewModel
             _temp = channel.temp;
             Temp = _temp;
             if (CurrentPitmasterStep != null && PitmasterRunning) {
-                if (Temp > CurrentPitmasterStep.Temperature || (CurrentPitmasterStep.TimeLeft < CurrentPitmasterStep.Time)) {
+                if ((Temp >= CurrentPitmasterStep.Temperature && CurrentPitmasterStep.Status == Status.HeatingUp)
+                    ||(Temp <= CurrentPitmasterStep.Temperature && CurrentPitmasterStep.Status == Status.CoolingDown)
+                    || (CurrentPitmasterStep.TimeLeft < CurrentPitmasterStep.Time)) {
                     CurrentPitmasterStep.TimeLeft--;
                     CurrentPitmasterStep.Status = Status.HoldingTemp;
                     _logger.Log( CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
 
                 }
-                else if(Temp < CurrentPitmasterStep.Temperature) {
+                else if(CurrentPitmasterStep.Status == Status.HeatingUp) {
                     CurrentPitmasterStep.HeatingTime++;
-                    CurrentPitmasterStep.Status = Status.HeatingUp;
+                    _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
+                }
+                else if(CurrentPitmasterStep.Status == Status.CoolingDown) {
+                    CurrentPitmasterStep.HeatingTime--;
                     _logger.Log(CurrentPitmasterStep.Temperature + ";" + CurrentPitmasterStep.Time + ";" + CurrentPitmasterStep.HeatingTime + ";" + CurrentPitmasterStep.TimeLeft + ";" + Temp + ";\n");
 
                 }
+
                 if (CurrentPitmasterStep.TimeLeft == 0) {
                     PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].Status = Status.Done;
                     if(PitmasterSteps.Last().Equals(CurrentPitmasterStep)) {
