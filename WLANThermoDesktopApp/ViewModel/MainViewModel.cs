@@ -379,8 +379,8 @@ namespace WLANThermoDesktopApp.ViewModel
                 pid.Kd_a = Kd_a;
                 pid.Ki = Ki;
                 pid.Ki_a = Ki_a;
-                pid.Kd = Kd;
-                pid.Kd_a = Kd_a;
+                pid.Kp = Kp;
+                pid.Kp_a = Kp_a;
                 pid.DCmmax = DCmmax;
                 pid.DCmmin = DCmmin;
                 var temp = ThermoSettings.pid.ToArray();
