@@ -42,19 +42,19 @@ namespace WLANThermoDesktopApp.ViewModel
         private PitmasterStep _currentPitmasterStep;
         private int _elapsedTime;
         private bool _pitmasterRunning = false;
-        private bool _canEditDataGrid = true;
+        private bool _DataGridIsReadOnly = false;
         private Logger _logger;
         private int _connectionTimeoutCount = 0;
 
 
         #region Properties
-        public bool CanEditDataGrid
+        public bool DataGridIsReadOnly
         {
             get {
-                return _canEditDataGrid;
+                return _DataGridIsReadOnly;
             }
             set {
-                _canEditDataGrid = value;
+                _DataGridIsReadOnly = value;
                 OnPropertyChanged();
             }
         }
@@ -64,7 +64,7 @@ namespace WLANThermoDesktopApp.ViewModel
             }
                 set {
                 _pitmasterRunning = value;
-                CanEditDataGrid = !_pitmasterRunning;
+                DataGridIsReadOnly = _pitmasterRunning;
                 OnPropertyChanged();
             }
         }
@@ -417,7 +417,6 @@ namespace WLANThermoDesktopApp.ViewModel
                 StopPitmaster();
                 ElapsedTime = 0;
                 PitmasterRunning = false;
-                MessageBox.Show("Pitmaster Stopped!");
                 _logger.Log("PitmasterStopped!");
                 
             }
@@ -528,9 +527,9 @@ namespace WLANThermoDesktopApp.ViewModel
                 if (CurrentPitmasterStep.TimeLeft == 0) {
                     PitmasterSteps[PitmasterSteps.IndexOf(CurrentPitmasterStep)].Status = Status.Done;
                     if(PitmasterSteps.Last().Equals(CurrentPitmasterStep)) {
+                        StartStopPitmaster();
                         MessageBox.Show("Pitmaster finished!");
                         _logger.Log("Pitmaster finished!");
-                        StartStopPitmaster();
                     }
                     else {
                         

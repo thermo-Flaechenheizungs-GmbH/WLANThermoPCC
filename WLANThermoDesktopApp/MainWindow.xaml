@@ -17,7 +17,7 @@
         <TabItem Header="Pitmaster">
             <Grid >
                 <TextBox HorizontalAlignment="Left" Height="23" Margin="88,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="94" Text="{Binding Temp, Converter={StaticResource FloatToStringConverter}}" IsEnabled="False"/>
-                <DataGrid Name="DG"  HorizontalAlignment="Left" Height="334" Margin="10,32,0,0" VerticalAlignment="Top" Width="304" ItemsSource="{Binding PitmasterSteps}" AutoGenerateColumns="false" SelectedItem="{Binding SelectedPitmasterStep}" CanUserSortColumns="False" IsEnabled="{Binding CanEditDataGrid}">
+                <DataGrid Name="DG"  HorizontalAlignment="Left" Height="334" Margin="10,32,0,0" VerticalAlignment="Top" Width="304" ItemsSource="{Binding PitmasterSteps}" AutoGenerateColumns="false" SelectedItem="{Binding SelectedPitmasterStep}" CanUserSortColumns="False" IsReadOnly="{Binding DataGridIsReadOnly}" Foreground="Black">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Temp" Binding="{Binding Temperature ,Converter={StaticResource FloatToStringConverter}}"/>
                         <DataGridTextColumn Header="Seconds" Binding="{Binding Time}"/>
@@ -26,7 +26,7 @@
                         <DataGridTextColumn Header="Status" Binding="{Binding Status}" IsReadOnly="True"  FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid"/>
                     </DataGrid.Columns>
                     <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow">
+                        <Style TargetType="{x:Type DataGridRow}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding  Status}" Value="Done">
                                     <Setter Property="Background" Value="Green"/>
