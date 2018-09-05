@@ -52,9 +52,11 @@
                     </Button.Style>
                 </Button>
                 <Button Content="&#xf067;" HorizontalAlignment="Left" Margin="319,58,0,0" VerticalAlignment="Top" Width="20" Command="{Binding NewEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
-                <Button Content="&#xf068;" HorizontalAlignment="Left" Margin="319,82,0,0" VerticalAlignment="Top" Width="20" Command="{Binding DeleteEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf068;" HorizontalAlignment="Left" Margin="319,83,0,0" VerticalAlignment="Top" Width="20" Command="{Binding DeleteEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
                 <Button Content="&#xf077;" HorizontalAlignment="Left" Margin="319,108,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveUpEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
-                <Button Content="&#xf078;" HorizontalAlignment="Left" Margin="319,132,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveDownEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf078;" HorizontalAlignment="Left" Margin="319,133,0,0" VerticalAlignment="Top" Width="20" Command="{Binding MoveDownEntryClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20"/>
+                <Button Content="&#xf019;" HorizontalAlignment="Left" Margin="319,192,0,0" VerticalAlignment="Top" Width="20" Command="{Binding WriteToFileClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20" ToolTip="Save To File"/>
+                <Button Content="&#xf093;" HorizontalAlignment="Left" Margin="319,167,0,0" VerticalAlignment="Top" Width="20" Command="{Binding ReadFromFileClicked}" FontFamily="/WLANThermoDesktopApp;component/webfonts/#Font Awesome 5 Free Solid" Height="20" ToolTip="Load From File"/>
                 <Label Content="Temperatur" HorizontalAlignment="Left" Margin="10,1,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
 
             </Grid>

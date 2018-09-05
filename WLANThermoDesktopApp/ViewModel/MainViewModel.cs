@@ -12,6 +12,8 @@ using WLANThermoDesktopApp.Model;
 using System.Net.Http.Headers;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using Microsoft.Win32;
+using System.IO;
 
 namespace WLANThermoDesktopApp.ViewModel
 {
@@ -262,8 +264,8 @@ namespace WLANThermoDesktopApp.ViewModel
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             _timer.Interval = _timerIntervall;
             _logger = new Logger(@".\logs\");
-           
 
+#if DEBUG 
             IP = "192.168.0.101";
             Username = "admin";
             Password = "admin";
@@ -275,7 +277,7 @@ namespace WLANThermoDesktopApp.ViewModel
             temp.Time = 100;
             temp.Temperature = 30;
             PitmasterSteps.Add(temp);
-  
+#endif 
             //ConnectThermometer();
             //getData();
             //getSettings();
@@ -501,6 +503,41 @@ namespace WLANThermoDesktopApp.ViewModel
                 PitmasterSteps.Move(selectedIndex, selectedIndex + 1);
             }
         }
+        private void WriteToFile()
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Title = "Select File";
+            dialog.Filter = "IniFile|*.ini";
+            dialog.AddExtension = true;
+            dialog.ShowDialog();
+            if (dialog.FileName != null && !string.IsNullOrWhiteSpace(dialog.FileName)) {
+                StreamWriter file = new StreamWriter(dialog.FileName);
+                foreach(var item in PitmasterSteps) {
+                    file.WriteLine(item.WriteToString()); 
+                }
+                file.Close();
+            }
+
+        }
+        private void ReadFromFile()
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Title = "Select File";
+            dialog.Multiselect = false;
+            dialog.Filter = "IniFile|*.ini";
+            dialog.AddExtension = true;
+            dialog.ShowDialog();
+            if(dialog.FileName != null && !string.IsNullOrWhiteSpace(dialog.FileName)) {
+                StreamReader file = new StreamReader(dialog.FileName);
+                PitmasterSteps.Clear();
+                while (!file.EndOfStream) {
+                    var line = new PitmasterStep();
+                    line.ReadFromString(file.ReadLine());
+                    PitmasterSteps.Add(line);
+                }
+                file.Close();
+            }
+        }
 
         #region EventHandlers
         private void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -571,6 +608,8 @@ namespace WLANThermoDesktopApp.ViewModel
         public ICommand MoveUpEntryClicked => new DelegateCommand(MoveUpPitmasterStep);
         public ICommand MoveDownEntryClicked => new DelegateCommand(MoveDownPitmasterStep);
         public ICommand StartPitmasterClicked => new DelegateCommand(StartStopPitmaster);
+        public ICommand WriteToFileClicked => new DelegateCommand(WriteToFile);
+        public ICommand ReadFromFileClicked => new DelegateCommand(ReadFromFile);
         #endregion
     }
 }
