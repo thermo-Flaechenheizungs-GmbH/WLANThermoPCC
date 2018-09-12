@@ -430,6 +430,10 @@ namespace WLANThermoDesktopApp.ViewModel
             else {
                 if (_thermometerConnected) {
                     try { 
+                        foreach(var item in PitmasterSteps) {
+                            item.Status = Status.NotStarted;
+                            item.TimeLeft = 0;
+                        }
                         CurrentPitmasterStep = PitmasterSteps.First();
                         PitmasterRunning = true;
                         _logger.Log("Pitmaster Starting.");
