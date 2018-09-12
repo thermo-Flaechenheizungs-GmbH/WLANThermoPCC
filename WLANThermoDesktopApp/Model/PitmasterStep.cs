@@ -51,7 +51,7 @@ namespace WLANThermoDesktopApp.Model
         public void ReadFromString(string inputString)
         {
             if (!string.IsNullOrEmpty(inputString) && inputString.IndexOf(_delimiter) > 0) {
-                this.Temperature = int.Parse(inputString.Substring(0, inputString.IndexOf(_delimiter)));
+                this.Temperature = float.Parse(inputString.Substring(0, inputString.IndexOf(_delimiter)));
                 inputString = inputString.Substring(inputString.IndexOf(_delimiter)+1);
                 this.Time = int.Parse(inputString.Substring(0, inputString.IndexOf(_delimiter) ));
                 inputString = inputString.Substring(inputString.IndexOf(_delimiter));
