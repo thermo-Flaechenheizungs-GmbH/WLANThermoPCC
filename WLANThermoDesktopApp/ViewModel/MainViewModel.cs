@@ -433,6 +433,7 @@ namespace WLANThermoDesktopApp.ViewModel
                         foreach(var item in PitmasterSteps) {
                             item.Status = Status.NotStarted;
                             item.TimeLeft = 0;
+                            item.HeatingTime = 0;
                         }
                         CurrentPitmasterStep = PitmasterSteps.First();
                         PitmasterRunning = true;
