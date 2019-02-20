@@ -11,7 +11,7 @@ namespace WLANThermoDesktopApp.Model
     {
         public SystemData system { get; set; }
         public List<Channel> channel { get; set; }
-        public List<Pitmaster> pitmaster { get; set; }
+        public PitmasterCollection pitmaster { get; set; }
 
     }
 }

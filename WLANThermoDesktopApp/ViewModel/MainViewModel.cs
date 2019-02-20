@@ -220,7 +220,7 @@ namespace WLANThermoDesktopApp.ViewModel
                         temp.Add(item.name);
                     }
                     PIDProfiles = temp;
-                    SelectedPIDProfile = temp.ToArray()[_thermoData.pitmaster.First().pid];
+                    SelectedPIDProfile = temp.ToArray()[_thermoData.pitmaster.pm.First().pid];
                     OnPropertyChanged();
                 }
             }
@@ -266,7 +266,7 @@ namespace WLANThermoDesktopApp.ViewModel
             _logger = new Logger(@".\logs\");
 
 #if DEBUG 
-            IP = "192.168.0.101";
+            IP = "192.168.0.10";
             Username = "admin";
             Password = "admin";
             var temp = new PitmasterStep();
@@ -455,18 +455,18 @@ namespace WLANThermoDesktopApp.ViewModel
         }
         public async Task StopPitmaster()
         {
-            var temp = _thermoData.pitmaster.First();
-            _thermoData.pitmaster.First().typ = "off";
-            await SetData("/setpitmaster", JsonConvert.SerializeObject(_thermoData.pitmaster));
+            var temp = _thermoData.pitmaster.pm.First();
+            _thermoData.pitmaster.pm.First().typ = "off";
+            await SetData("/setpitmaster", JsonConvert.SerializeObject(_thermoData.pitmaster.pm));
         }
         public async Task SetPitmaster()
         {
             ElapsedTime = 0;
-            var temp = _thermoData.pitmaster.First();
-            _thermoData.pitmaster.First().pid = PIDProfiles.IndexOf(SelectedPIDProfile);
-            _thermoData.pitmaster.First().typ = "auto";
-            _thermoData.pitmaster.First().set = CurrentPitmasterStep.Temperature;
-            await SetData("/setpitmaster", JsonConvert.SerializeObject(_thermoData.pitmaster));
+            var temp = _thermoData.pitmaster.pm.First();
+            _thermoData.pitmaster.pm.First().pid = PIDProfiles.IndexOf(SelectedPIDProfile);
+            _thermoData.pitmaster.pm.First().typ = "auto";
+            _thermoData.pitmaster.pm.First().set = CurrentPitmasterStep.Temperature;
+            await SetData("/setpitmaster", JsonConvert.SerializeObject(_thermoData.pitmaster.pm));
         }
         public async Task SetData(string service, string data)
         {
@@ -555,7 +555,7 @@ namespace WLANThermoDesktopApp.ViewModel
             if(ThermoData == null) {
                 return;
             }
-            var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.First().channel);
+            var channel = _thermoData.channel.Find(x => x.number == _thermoData.pitmaster.pm.First().channel);
             _temp = channel.temp;
             Temp = _temp;
             if (CurrentPitmasterStep != null && PitmasterRunning) {

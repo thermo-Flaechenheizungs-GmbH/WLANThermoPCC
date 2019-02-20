@@ -14,7 +14,6 @@ namespace WLANThermoDesktopApp.Model
         public List<string> aktor { get; set; }
         public IoT iot { get; set; }
         public List<string> hardware { get; set; }
-        public List<string> notification { get; set; }
         public API api { get; set; }
     }
 }

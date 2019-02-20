@@ -134,6 +134,7 @@
     <Compile Include="Converter\FloatToStringConverter.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Model\API.cs" />
+    <Compile Include="Model\PitmasterCollection.cs" />
     <Compile Include="Model\PitmasterStep.cs" />
     <Compile Include="ObservableObject.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
